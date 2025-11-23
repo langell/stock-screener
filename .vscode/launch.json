@@ -1,0 +1,52 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "chrome",
+      "request": "attach",
+      "name": "Attach to React (Vite)",
+      "port": 9222,
+      "pathMapping": {
+        "/": "${workspaceRoot}/web/",
+        "/src": "${workspaceRoot}/web/src"
+      },
+      "sourceMaps": true
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Server",
+      "program": "${workspaceRoot}/server.ts",
+      "runtimeArgs": ["--import", "tsx"],
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": ["<node_internals>/**"],
+      "outFiles": ["${workspaceRoot}/dist/**/*.js"],
+      "resolveSourceMapLocations": [
+        "${workspaceRoot}/**",
+        "!**/node_modules/**"
+      ],
+      "sourceMaps": true,
+      "trace": "verbose"
+    },
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Attach to Server (Already Running)",
+      "port": 9229,
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Debug Full Stack",
+      "configurations": ["Debug Server", "Attach to React (Vite)"],
+      "stopOnEntry": false,
+      "preLaunchTask": null
+    }
+  ]
+}
+

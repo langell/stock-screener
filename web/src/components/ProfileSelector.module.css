@@ -1,0 +1,250 @@
+/* Container */
+.container {
+  margin-bottom: 32px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.container h2 {
+  display: none;
+}
+
+/* Segmented Tabs Container */
+.tabsContainer {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #334155;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  background-color: transparent;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #cbd5e1;
+  position: relative;
+}
+
+.tab:hover {
+  background-color: rgba(51, 65, 85, 0.5);
+  color: #e2e8f0;
+}
+
+.tab.active {
+  border-color: #e2e8f0;
+  color: #e2e8f0;
+}
+
+.tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -14px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: 2px;
+}
+
+/* Category-specific tab colors */
+.tab.active.watchlist::after {
+  background-color: #10b981;
+}
+
+.tab.active.daily::after {
+  background-color: #f59e0b;
+}
+
+.tab.active.growth::after {
+  background-color: #3b82f6;
+}
+
+.tab.active.value::after {
+  background-color: #818cf8;
+}
+
+.tab.active.funds::after {
+  background-color: #a78bfa;
+}
+
+/* Category Header */
+.categoryHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 8px 0;
+}
+
+.categoryIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: #e2e8f0;
+}
+
+.categoryLabel {
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #cbd5e1;
+}
+
+/* Grid for screeners */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Screener Cards - Base Styles */
+.screenerCard {
+  padding: 12px 14px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  text-align: left;
+  border-left: 3px solid transparent;
+  cursor: pointer;
+  background-color: #0f172a;
+  border: 1px solid #334155;
+}
+
+.screenerCard:hover {
+  transform: translateX(4px);
+}
+
+/* Watchlist Category */
+.screenerCard.category-watchlist {
+  background: linear-gradient(135deg, #0f3a27 0%, #0d2e20 100%);
+  border-left-color: #10b981;
+  border-color: #10b981;
+}
+
+.screenerCard.category-watchlist:hover {
+  background: linear-gradient(135deg, #1a4d34 0%, #156838 100%);
+  border-color: #34d399;
+  box-shadow: 0 8px 16px rgba(16, 185, 129, 0.3);
+}
+
+/* Daily Category */
+.screenerCard.category-daily {
+  background: linear-gradient(135deg, #3d2415 0%, #2e1a0f 100%);
+  border-left-color: #f59e0b;
+  border-color: #f59e0b;
+}
+
+.screenerCard.category-daily:hover {
+  background: linear-gradient(135deg, #6b3f1f 0%, #4d2410 100%);
+  border-color: #fbbf24;
+  box-shadow: 0 8px 16px rgba(245, 158, 11, 0.3);
+}
+
+/* Growth Category */
+.screenerCard.category-growth {
+  background: linear-gradient(135deg, #1e3a8a 0%, #172554 100%);
+  border-left-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.screenerCard.category-growth:hover {
+  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+  border-color: #60a5fa;
+  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
+}
+
+/* Value Category */
+.screenerCard.category-value {
+  background: linear-gradient(135deg, #3730a3 0%, #2d21a9 100%);
+  border-left-color: #818cf8;
+  border-color: #818cf8;
+}
+
+.screenerCard.category-value:hover {
+  background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+  border-color: #a5b4fc;
+  box-shadow: 0 8px 16px rgba(129, 140, 248, 0.3);
+}
+
+/* Funds Category */
+.screenerCard.category-funds {
+  background: linear-gradient(135deg, #5b21b6 0%, #43185f 100%);
+  border-left-color: #a78bfa;
+  border-color: #a78bfa;
+}
+
+.screenerCard.category-funds:hover {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  border-color: #ddd6fe;
+  box-shadow: 0 8px 16px rgba(167, 139, 250, 0.3);
+}
+
+/* Labels */
+.label {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 4px;
+  color: #e2e8f0;
+}
+
+.description {
+  font-size: 12px;
+  color: #cbd5e1;
+  line-height: 1.4;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .tabsContainer {
+    gap: 8px;
+  }
+
+  .tab {
+    width: 40px;
+    height: 40px;
+  }
+
+  .grid {
+    gap: 6px;
+  }
+
+  .screenerCard {
+    padding: 10px 12px;
+  }
+
+  .label {
+    font-size: 13px;
+  }
+
+  .description {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tabsContainer {
+    gap: 4px;
+  }
+
+  .tab {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+  }
+
+  .categoryLabel {
+    font-size: 12px;
+  }
+}
