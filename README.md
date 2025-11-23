@@ -1,53 +1,48 @@
-# Stock Screener with Alpha Vantage
+# Stock Screener with Yahoo Finance
 
-A Node.js + React stock screener application using the **Alpha Vantage API**. Screen stocks by various metrics like market cap, P/E ratio, dividends, daily gaps, and sector.
+A full-stack Node.js + React stock screener application using **Yahoo Finance API**. Screen stocks by gap percentage, price range, P/E ratio, market cap, dividend yield, sector, exchange, and more.
 
 ## Features
 
-- Query stocks by multiple criteria (market cap, P/E, price range, sector, **daily gap**, etc.)
-- Real-time data from Alpha Vantage API
+- **Multi-criteria stock screening** - Filter by gap, price, P/E ratio, market cap, dividend yield, sector, exchange, active trading status
+- **Real-time data** from Yahoo Finance (free, no API key required)
 - **Web-based frontend** with React, TypeScript, and Vite
-- **REST API backend** with Express.js and TypeScript
-- Easy-to-use CLI and programmatic API
-- **Gap screening** - Find stocks with large daily price gaps (>20%, >50%, or negative)
-- Full test coverage (>90%)
-- VS Code debugging with full-stack configuration
+- **REST API backend** with Express.js
+- **15 pre-configured screeners** (Daily Gainers, Tech Stocks, Dividend Stocks, etc.)
+- **Comprehensive test suite** - 125 tests (114 mocked, 11 integration)
+- **29.37% code coverage** with focus on core screening logic (60.24% on yahoo-client.ts)
+- Dark theme UI with responsive design
 
 ## 📚 Documentation
 
 For detailed guides, see the [docs folder](./docs/):
 
 - **[Quick Start](./docs/QUICKSTART.md)** - Get up and running in minutes
-- **[Alpha Vantage Setup](./docs/ALPHA_VANTAGE_SETUP.md)** - API configuration and usage
-- **[Testing Guide](./docs/TESTING.md)** - How to run tests
+- **[Testing Guide](./docs/TESTING.md)** - 125 tests, coverage metrics, CI/CD setup
+- **[Test Coverage Report](./docs/TEST_COVERAGE.md)** - Detailed coverage analysis
 - **[Debugging Guide](./docs/DEBUG_GUIDE.md)** - VS Code debugging setup
 - **[Full Project Status](./docs/PROJECT_COMPLETE.md)** - Complete feature list
-- **[Documentation Index](./docs/INDEX.md)** - All available documentation
 
 ## Setup
 
-1. **Get API Key**: Sign up at [Alpha Vantage](https://www.alphavantage.co/support/#api-key) and get your free API key
-
-2. **Install Dependencies**:
+1. **Install Dependencies**:
 ```bash
 npm install
 cd web && npm install && cd ..
 ```
 
-3. **Configure Environment**:
-Create `.env` file in the root directory:
-```
-ALPHA_ADVANTAGE_API_KEY=your_api_key_here
-VITE_API_URL=http://localhost:3001
-```
-
-4. **Start the Application**:
+2. **Start the Application**:
 ```bash
-npm start          # Start server on http://localhost:3001
+# Terminal 1: Start the API server (port 3001)
+npm run server
 
-# In another terminal:
-cd web && npm run dev   # Start frontend on http://localhost:3000
+# Terminal 2: Start the React frontend (port 3000)
+cd web && npm run dev
 ```
+
+3. **Open in browser**: `http://localhost:3000`
+
+**Note:** No API key required! Uses free Yahoo Finance data.
 
 ## Usage
 
@@ -55,176 +50,189 @@ cd web && npm run dev   # Start frontend on http://localhost:3000
 
 ```bash
 # Terminal 1: Start the API server
-npm start          # Server on port 3001
+npm run server          # Server on port 3001
 
 # Terminal 2: Start the React frontend
 cd web && npm run dev   # Frontend on port 3000
 ```
 
-Then open your browser to `http://localhost:3000`
+Open `http://localhost:3000` in your browser.
 
 **Features:**
-- Interactive stock screening with quick profile buttons
+- 15 pre-configured screening profiles (tabs at the top)
 - Custom filter panel for advanced searches
 - Real-time results table with sortable columns
-- Gap percentage calculations
-- Full responsive design
+- Gap percentage, price, P/E, market cap, dividend yield filters
+- Sector and exchange filtering
+- Responsive dark theme UI
 
-### CLI Usage
-
-#### Using the shell script (recommended):
-
-```bash
-# Make it executable (first time only)
-chmod +x screener.sh
-
-# Show help
-./screener.sh help
-
-# Run a screening profile
-./screener.sh screen tech_growth
-./screener.sh screen large_gap
-./screener.sh screen dividend_aristocrats
-
-# Run examples
-./screener.sh gap          # Gap screening examples
-./screener.sh advanced     # Advanced analysis examples
-./screener.sh test         # Run test suite
-```
-
-##### Optional: Add to PATH for global access
+### API Usage
 
 ```bash
-# Create symlink to /usr/local/bin (requires sudo)
-sudo ln -s $(pwd)/screener-global.sh /usr/local/bin/screener
+# Screen with predefined screener (ID 1-15)
+curl -X POST http://localhost:3001/api/screen/predefined \
+  -H "Content-Type: application/json" \
+  -d '{"id": 1, "limit": 50}'
 
-# Now you can run from anywhere:
-screener help
-screener screen tech_growth
-screener screen large_gap
-```
-
-#### Using npm directly:
-
-```bash
-npm run screen -- market_cap_small
-npm run screen -- dividend_aristocrats
-npm run screen -- tech_growth
-
-# Screen for stocks with large gaps
-npm run screen -- large_gap      # Gap > 20%
-npm run screen -- huge_gap       # Gap > 50%
-npm run screen -- negative_gap   # Gap < -10%
-
-# Run gap screening examples
-npm run examples:gap
+# Screen with custom filters
+curl -X POST http://localhost:3001/api/screen \
+  -H "Content-Type: application/json" \
+  -d '{
+    "minGap": 10,
+    "minPrice": 5,
+    "maxPrice": 500,
+    "sector": "Technology",
+    "limit": 50
+  }'
 ```
 
 ### Programmatic Usage
 
 ```typescript
-import { FMPScreener } from './src/fmp-client';
+import { Screener } from './api/src/yahoo-client';
 
-const screener = new FMPScreener('your_api_key');
+const screener = new Screener();
 
-// Screen stocks by market cap
-const smallCap = await screener.screenByMarketCap(1e6, 1e8);
+// Screen with predefined screener
+const dailyGainers = await screener.screenPredefined(1, 50);
 
-// Screen growth stocks
-const growth = await screener.screenByPERatio(0, 25);
-
-// Screen by daily gap - find stocks that gapped up > 20%
-const largeGaps = await screener.screenByLargeGap(20);
-
-// Screen for negative gaps (gapped down > 10%)
-const negativeGaps = await screener.screenByNegativeGap(-100, -10);
-
-// Get a stock quote with gap calculation
-const quote = await screener.getStockQuoteWithGap('AAPL');
-console.log(`AAPL: ${quote.price}, Gap: ${quote.gap}%`);
-
-// Custom filters
+// Screen with custom filters
 const results = await screener.screen({
-  limit: 100,
-  minMarketCap: 1e9,
-  maxMarketCap: 50e9,
-  minPrice: 10,
-  maxPrice: 500,
-  sector: 'Technology'
+  minGap: 10,              // Min daily gap %
+  maxGap: 50,              // Max daily gap %
+  minPrice: 5,             // Min price
+  maxPrice: 500,           // Max price
+  minPE: 10,               // Min P/E ratio
+  maxPE: 30,               // Max P/E ratio
+  minMarketCap: 1e9,       // Min market cap
+  maxMarketCap: 100e9,     // Max market cap
+  minDividendYield: 2,     // Min dividend yield %
+  sector: 'Technology',    // By sector
+  exchange: 'NASDAQ',      // By exchange
+  isActivelyTrading: true, // Only active trading
+  limit: 100
 });
 ```
 
 ## API Reference
 
-### FMPScreener Class
+### REST Endpoints
 
-- `screen(filters)` - Screen stocks with custom filters
-- `screenByMarketCap(min, max)` - Filter by market cap range
-- `screenByPERatio(min, max)` - Filter by P/E ratio
-- `screenByDividendYield(min, max)` - Filter by dividend yield
-- `screenByPriceRange(min, max)` - Filter by price range
-- `screenByGap(min, max)` - Filter by gap percentage range
-- `screenByLargeGap(percentage)` - Find stocks with gap > percentage (e.g., >20%)
-- `screenByNegativeGap(min, max)` - Find stocks that gapped down
-- `screenBySector(sector)` - Filter by sector
-- `getStockQuote(symbol)` - Get current quote for a symbol
-- `getStockQuoteWithGap(symbol)` - Get quote with calculated gap percentage
+- `POST /api/screen/predefined` - Screen with predefined screener (ID 1-15)
+- `POST /api/screen` - Screen with custom filters
+- `POST /api/watchlist/screen` - Screen watchlist
 
-## Built-in Screening Profiles
+### Screener Class Methods
 
-The CLI includes pre-configured screening profiles:
+```typescript
+// Predefined screeners (ID 1-15)
+screenPredefined(id: number, limit?: number): Promise<Stock[]>
 
-- **small_cap** - Stocks under $2B market cap
-- **large_cap** - Stocks over $10B market cap
-- **dividend_aristocrats** - High dividend yielding stocks
-- **tech_growth** - Tech sector growth stocks
-- **value_stocks** - Low P/E ratio stocks
-- **large_gap** - Stocks with daily gap > 20%
-- **huge_gap** - Stocks with daily gap > 50%
-- **negative_gap** - Stocks that gapped down > 10%
+// Custom screening
+screen(filters: FilterOptions): Promise<Stock[]>
 
-## Rate Limits
+// Filter options
+interface FilterOptions {
+  minGap?: number;           // Min daily gap %
+  maxGap?: number;           // Max daily gap %
+  minPrice?: number;         // Min stock price
+  maxPrice?: number;         // Max stock price
+  minPE?: number;            // Min P/E ratio
+  maxPE?: number;            // Max P/E ratio
+  minMarketCap?: number;     // Min market cap
+  maxMarketCap?: number;     // Max market cap
+  minDividendYield?: number; // Min dividend yield %
+  sector?: string;           // Filter by sector
+  exchange?: string;         // Filter by exchange (NASDAQ, NYSE, AMEX)
+  isActivelyTrading?: boolean; // Only actively trading stocks
+  limit?: number;            // Result limit (default 50)
+}
+```
 
-**Alpha Vantage Free Tier:**
-- 5 API calls/minute
-- 500 calls/day
+## 15 Pre-configured Screeners
 
-The app intelligently falls back to demo data when limits are reached. For production, upgrade to a paid plan ($20+/month) for higher limits.
+1. **Daily Gainers** - Top daily gainers
+2. **Active Stocks** - Most actively traded
+3. **Gainers** - Biggest gainers today
+4. **Losers** - Biggest losers today
+5. **Most Active** - Most active by volume
+6. **Undervalued Growth** - Low P/E with growth
+7. **Conservative Growth** - Stable growth stocks
+8. **Dividend Aristocrats** - High dividend stocks
+9. **Technology Stocks** - Tech sector
+10. **Healthcare Stocks** - Healthcare sector
+11. **Financial Stocks** - Finance sector
+12. **Energy Stocks** - Energy sector
+13. **Small Cap** - Market cap < $2B
+14. **Mid Cap** - Market cap $2B-$10B
+15. **Large Cap** - Market cap > $10B
 
 ## Project Structure
 
 ```
 stocks/
-├── README.md                 # This file
-├── docs/                     # Documentation (see INDEX.md)
-│   ├── QUICKSTART.md
-│   ├── ALPHA_VANTAGE_SETUP.md
-│   ├── TESTING.md
-│   └── ...
-├── src/                      # Backend source code
-│   ├── fmp-client.ts         # Alpha Vantage API wrapper
-│   ├── analyzer.ts           # Screening logic
-│   └── ...
-├── web/                      # React frontend (TypeScript)
+├── README.md                      # This file
+├── docs/                          # Documentation
+│   ├── TESTING.md                 # Test reference (125 tests)
+│   ├── TEST_COVERAGE.md           # Coverage metrics
+│   ├── QUICKSTART.md              # Getting started
+│   ├── DEBUG_GUIDE.md             # Debugging setup
+│   └── PROJECT_COMPLETE.md        # Feature list
+├── api/src/
+│   └── yahoo-client.ts            # Yahoo Finance integration (341 lines, 60% coverage)
+├── web/                           # React frontend (Vite + TypeScript)
 │   ├── src/
-│   ├── components/
+│   │   ├── components/
+│   │   │   ├── ProfileSelector.tsx   # Screener tabs UI
+│   │   │   ├── ResultsTable.tsx      # Results display
+│   │   │   └── TickerManager.tsx     # Watchlist
+│   │   ├── api/screener.ts
+│   │   └── main.tsx
 │   └── package.json
-├── tests/                    # Test suite
-├── server.ts                 # Express API server
-├── package.json
+├── tests/                         # Test suite (125 tests)
+│   ├── yahoo-client.mocked.test.ts  # 59 unit tests
+│   ├── api.mocked.test.ts           # 28 API tests
+│   ├── integration.test.ts          # 11 integration tests
+│   └── extended-coverage.test.ts    # 27 extended tests
+├── server.ts                      # Express API (214 lines)
+├── vitest.config.ts               # Test configuration
+├── package.json                   # Dependencies
 └── tsconfig.json
 ```
 
 ## Testing
 
+**125 tests across 4 suites** - all passing ✅
+
 ```bash
-npm run test:all             # Run all tests
-npm run test:fmp             # FMP client tests
-npm run test:analyzer        # Analyzer tests
-npm run test:components      # Component tests
+# Run all tests (16 seconds)
+npm test
+
+# Run with coverage report
+npm run test:coverage
+
+# Run specific suite
+npm test -- tests/yahoo-client.mocked.test.ts
+npm test -- tests/api.mocked.test.ts
+npm test -- tests/integration.test.ts
 ```
 
-See [Testing Guide](./docs/TESTING.md) for details.
+**Coverage Metrics:**
+| Metric | Value | Target |
+|--------|-------|--------|
+| Statements | 29.37% | 90% |
+| Core (yahoo-client.ts) | 60.24% | 90% |
+| Branches | 38.29% | 80% |
+| Functions | 32.25% | 90% |
+| Lines | 28.9% | 90% |
+
+**Test Breakdown:**
+- **59 unit tests** - Yahoo Client (mocked) - <1s
+- **28 API tests** - Endpoints (mocked) - <1s
+- **27 extended tests** - Complex scenarios (mocked) - <1s
+- **11 integration tests** - Real Yahoo Finance data - ~15s
+
+See [Testing Guide](./docs/TESTING.md) for detailed information.
 
 ## License
 
